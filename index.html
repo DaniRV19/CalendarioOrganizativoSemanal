@@ -13,11 +13,12 @@
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     }
     .hour-cell {
-      min-height: 60px;
+      min-height: 50px;
       border: 1px solid #ddd;
       position: relative;
       cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      word-break: break-word;
     }
     .hour-cell:hover {
       transform: translateY(-2px);
@@ -25,14 +26,14 @@
     }
     .event-box {
       position: absolute;
-      top: 5px;
-      left: 5px;
-      right: 5px;
-      bottom: 5px;
-      padding: 5px;
-      border-radius: 8px;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      padding: 2px;
+      border-radius: 6px;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.7rem;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -46,42 +47,68 @@
       color: #fff;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      font-size: 0.75rem;
+      padding: 0.3rem;
     }
     #calendarContainer {
       border-radius: 12px;
-      overflow: hidden;
+      overflow-x: auto;
+      overflow-y: hidden;
       box-shadow: 0 10px 25px rgba(0,0,0,0.1);
       background: #fff;
-      padding: 15px;
+      padding: 5px;
     }
     .btn-download {
       background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
       color: #fff;
       font-weight: bold;
       border: none;
+      font-size: 0.8rem;
+      padding: 0.3rem 0.5rem;
     }
     .modal-content {
       border-radius: 12px;
-      padding: 15px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      padding: 10px;
     }
     .form-control-color {
-      width: 60px;
-      height: 40px;
+      width: 50px;
+      height: 35px;
       padding: 0;
+    }
+
+    @media (max-width: 768px) {
+      .hour-cell {
+        min-height: 40px;
+        font-size: 0.65rem;
+      }
+      .event-box {
+        font-size: 0.6rem;
+        padding: 1px;
+      }
+      .table thead th {
+        font-size: 0.65rem;
+        padding: 0.2rem;
+      }
+      #calendarContainer {
+        padding: 3px;
+      }
+      .btn-download {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.4rem;
+      }
     }
   </style>
 </head>
-<body class="p-2 p-md-4">
+<body class="p-2 p-md-3">
 
-  <div class="container">
-    <h1 class="text-center mb-4 display-5 fw-bold">Calendario Semanal</h1>
+  <div class="container-fluid">
+    <h1 class="text-center mb-3 display-6 fw-bold">Calendario Semanal</h1>
 
-    <div class="d-flex justify-content-end mb-3">
-      <button class="btn btn-download btn-lg" id="downloadPdf">Descargar PDF</button>
+    <div class="d-flex justify-content-end mb-2">
+      <button class="btn btn-download btn-sm" id="downloadPdf">Descargar PDF</button>
     </div>
 
-    <div id="calendarContainer" class="table-responsive">
+    <div id="calendarContainer">
       <table class="table table-bordered text-center align-middle rounded">
         <thead>
           <tr>
@@ -102,25 +129,21 @@
           <h5 class="modal-title">Evento</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-
         <div class="modal-body">
           <input type="hidden" id="modal-day">
           <input type="hidden" id="modal-hour">
-
-          <div class="mb-3">
+          <div class="mb-2">
             <label class="form-label fw-semibold">Descripción</label>
             <input type="text" id="eventText" class="form-control" placeholder="Nombre del evento">
           </div>
-
-          <div class="mb-3 d-flex align-items-center gap-3">
+          <div class="mb-2 d-flex align-items-center gap-2">
             <label class="form-label fw-semibold mb-0">Color</label>
             <input type="color" id="eventColor" class="form-control form-control-color" value="#0d6efd">
           </div>
         </div>
-
         <div class="modal-footer border-0">
-          <button class="btn btn-danger" id="deleteEvent">Eliminar</button>
-          <button class="btn btn-primary" id="saveEvent">Guardar</button>
+          <button class="btn btn-danger btn-sm" id="deleteEvent">Eliminar</button>
+          <button class="btn btn-primary btn-sm" id="saveEvent">Guardar</button>
         </div>
       </div>
     </div>
@@ -149,17 +172,26 @@
 
     function renderCalendar() {
       calendarBody.innerHTML = '';
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentDayIndex = now.getDay() === 0 ? 6 : now.getDay() - 1;
+
       hours.forEach(hour => {
         const row = document.createElement('tr');
         const hourCell = document.createElement('td');
         hourCell.textContent = `${hour}:00`;
         row.appendChild(hourCell);
 
-        days.forEach(day => {
+        days.forEach((day, dIndex) => {
           const cell = document.createElement('td');
           cell.className = 'hour-cell';
           cell.dataset.day = day;
           cell.dataset.hour = hour;
+
+          if (dIndex === currentDayIndex && hour === currentHour) {
+            cell.style.backgroundColor = '#fff3cd';
+            cell.style.transition = 'background-color 0.5s';
+          }
 
           const key = `${day}-${hour}`;
           if (events[key]) {
@@ -169,7 +201,6 @@
             div.style.backgroundColor = e.color;
             div.textContent = e.text;
             div.draggable = true;
-
             div.addEventListener('dragstart', dragStart);
             cell.appendChild(div);
           }
@@ -177,7 +208,6 @@
           cell.addEventListener('click', () => openModal(day, hour));
           cell.addEventListener('dragover', dragOver);
           cell.addEventListener('drop', drop);
-
           row.appendChild(cell);
         });
         calendarBody.appendChild(row);
@@ -186,23 +216,14 @@
 
     let draggedEvent = null;
 
-    function dragStart(e) {
-      draggedEvent = e.target;
-    }
-
-    function dragOver(e) {
-      e.preventDefault();
-    }
-
+    function dragStart(e) { draggedEvent = e.target; }
+    function dragOver(e) { e.preventDefault(); }
     function drop(e) {
       if (!draggedEvent) return;
       const cell = e.currentTarget;
       cell.appendChild(draggedEvent);
-
-      // Actualizar eventos en localStorage
       const oldKey = Object.keys(events).find(key => events[key].text === draggedEvent.textContent);
       if (oldKey) delete events[oldKey];
-
       const newDay = cell.dataset.day;
       const newHour = cell.dataset.hour;
       events[`${newDay}-${newHour}`] = { text: draggedEvent.textContent, color: draggedEvent.style.backgroundColor };
@@ -213,7 +234,6 @@
     function openModal(day, hour) {
       document.getElementById('modal-day').value = day;
       document.getElementById('modal-hour').value = hour;
-
       const key = `${day}-${hour}`;
       eventText.value = events[key] ? events[key].text : '';
       eventColor.value = events[key] ? events[key].color : '#0d6efd';
@@ -225,13 +245,8 @@
       const day = document.getElementById('modal-day').value;
       const hour = document.getElementById('modal-hour').value;
       const key = `${day}-${hour}`;
-
-      if (eventText.value.trim() !== '') {
-        events[key] = { text: eventText.value, color: eventColor.value };
-      } else {
-        delete events[key];
-      }
-
+      if (eventText.value.trim() !== '') events[key] = { text: eventText.value, color: eventColor.value };
+      else delete events[key];
       saveEventsToStorage();
       renderCalendar();
       eventModal.hide();
@@ -251,11 +266,8 @@
       const day = document.getElementById('modal-day').value;
       const hour = document.getElementById('modal-hour').value;
       const key = `${day}-${hour}`;
-      if (eventText.value.trim() !== '') {
-        events[key] = { text: eventText.value, color: eventColor.value };
-      } else {
-        delete events[key];
-      }
+      if (eventText.value.trim() !== '') events[key] = { text: eventText.value, color: eventColor.value };
+      else delete events[key];
       saveEventsToStorage();
       renderCalendar();
     });
