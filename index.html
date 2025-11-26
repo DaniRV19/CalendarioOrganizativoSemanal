@@ -3,238 +3,162 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Calendario Semanal</title>
+  <title>Calendario Semanal Mejorado y Colorido</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
     body {
-      background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      font-family: 'Roboto', sans-serif;
     }
-    h1 { color: #333; }
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      text-align: center;
+    }
     #calendarContainer {
       border-radius: 12px;
       overflow-x: auto;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      background: #fff;
-      padding: 10px;
+      background: #ffffff;
+      padding: 15px;
+      border: 2px solid #ddd;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     table {
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       width: 100%;
     }
     th {
-      background-color: #4a76a8;
+      background: linear-gradient(90deg, #bbece8 0%, #9fd5d1 100%);
       color: #fff;
       font-weight: 600;
-      padding: 8px;
+      padding: 10px;
       text-transform: uppercase;
       font-size: 0.85rem;
-      border-right: 2px solid #3b5d7c;
+      border: 1px solid #3b5c85;
     }
-    th:last-child { border-right: none; }
-    .hour-cell {
-      min-height: 50px;
-      border-left: 2px solid #c3cfe2;
-      border-bottom: 1px solid #ddd;
+    td {
+      border: 1px solid #ccc;
+      padding: 6px;
+      min-width: 80px;
       position: relative;
-      cursor: pointer;
-      transition: background 0.3s, transform 0.2s, border-color 0.2s;
-      background-color: #f8fbff;
+      transition: background 0.2s;
+      background-color: #f9f9f9;
     }
-    .hour-cell:nth-child(odd) { border-left: 2px solid #2575fc; }
-    .hour-cell:hover {
-      background-color: #d0e3ff;
-      transform: scale(1.02);
+    td.hour-cell:hover {
+      background-color: #e0f7fa;
+      cursor: pointer;
     }
     .event-box {
       position: absolute;
-      inset: 3px;
-      padding: 4px;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
       border-radius: 8px;
       color: #fff;
-      font-size: 0.75rem;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      word-wrap: break-word;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
       cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .event-box:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
     }
     .btn-download {
-      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+      background: linear-gradient(90deg, #ff6a00 0%, #ee0979 100%);
       color: #fff;
       font-weight: 600;
       border: none;
-      font-size: 0.85rem;
-      padding: 0.4rem 0.8rem;
+      font-size: 0.9rem;
+      padding: 0.5rem 1rem;
       border-radius: 6px;
       transition: background 0.3s;
     }
     .btn-download:hover {
-      background: linear-gradient(90deg, #2575fc 0%, #6a11cb 100%);
+      background: linear-gradient(90deg, #ee0979 0%, #ff6a00 100%);
     }
-    .modal-content { border-radius: 12px; padding: 15px; }
-    .form-control-color { width: 50px; height: 35px; padding: 0; }
+    .modal-content { border-radius: 12px; padding: 20px; }
+    .form-control-color { width: 50px; height: 35px; padding: 0; border-radius: 4px; }
     @media (max-width:768px){
-      .hour-cell{min-height:40px;font-size:0.65rem;}
-      .event-box{font-size:0.6rem;}
-      th{font-size:0.7rem; padding:6px;}
-      .btn-download{font-size:0.75rem;padding:0.3rem 0.5rem;}
+      td.hour-cell{min-height:40px;font-size:0.7rem;}
+      .event-box{font-size:0.65rem;}
+      th, td{padding:5px; font-size:0.75rem;}
+      .btn-download{font-size:0.8rem;padding:0.4rem 0.6rem;}
     }
   </style>
 </head>
 <body class="p-3">
 
-  <div class="container-fluid">
-    <h1 class="text-center mb-3 display-6 fw-bold">Calendario Semanal</h1>
-
-    <div class="d-flex justify-content-end mb-3">
-      <button class="btn btn-download" id="downloadPdf">Descargar PDF</button>
-    </div>
-
-    <div id="calendarContainer">
-      <table class="table text-center align-middle rounded">
-        <thead>
-          <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th><th>Sábado</th><th>Domingo</th></tr>
-        </thead>
-        <tbody id="calendarBody"></tbody>
-      </table>
-    </div>
+<div class="container-fluid">
+  <h1>Calendario Semanal</h1>
+  <div class="d-flex justify-content-end mb-3 gap-2">
+    <button class="btn btn-download" id="downloadPdf">Descargar PDF</button>
   </div>
-
-  <!-- Modal -->
-  <div class="modal fade" id="eventModal" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
-      <div class="modal-header border-0"><h5 class="modal-title">Añadir evento</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">
-        <input type="hidden" id="modal-day"><input type="hidden" id="modal-hour">
-        <div class="mb-2">
-          <label class="form-label fw-semibold">Descripción</label>
-          <input type="text" id="eventText" class="form-control" placeholder="Nombre del evento">
-        </div>
-        <div class="mb-2 d-flex align-items-center gap-2">
-          <label class="form-label fw-semibold mb-0">Color</label>
-          <input type="color" id="eventColor" class="form-control form-control-color" value="#0d6efd">
-        </div>
-        <div class="mb-2">
-          <label class="form-label fw-semibold">Hora inicio</label>
-          <select id="startHour" class="form-select mb-2"></select>
-        </div>
-        <div class="mb-2">
-          <label class="form-label fw-semibold">Hora fin</label>
-          <select id="endHour" class="form-select mb-2"></select>
-        </div>
-      </div>
-      <div class="modal-footer border-0">
-        <button class="btn btn-danger btn-sm" id="deleteEvent">Eliminar</button>
-        <button class="btn btn-primary btn-sm" id="saveEvent">Guardar</button>
-      </div>
-    </div></div>
+  <div id="calendarContainer">
+    <table class="table text-center align-middle">
+      <thead>
+        <tr><th>Hora</th><th>Lunes</th><th>Martes</th><th>Miércoles</th><th>Jueves</th><th>Viernes</th><th>Sábado</th><th>Domingo</th></tr>
+      </thead>
+      <tbody id="calendarBody"></tbody>
+    </table>
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<!-- Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+    <div class="modal-header border-0"><h5 class="modal-title">Añadir evento</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+    <div class="modal-body">
+      <input type="hidden" id="modal-day">
+      <input type="hidden" id="modal-start">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Descripción</label>
+        <input type="text" id="eventText" class="form-control" placeholder="Nombre del evento">
+      </div>
+      <div class="mb-3 d-flex align-items-center gap-2">
+        <label class="form-label fw-semibold mb-0">Color</label>
+        <input type="color" id="eventColor" class="form-control form-control-color" value="#ff6a00">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Hora fin</label>
+        <select id="endHour" class="form-select"></select>
+      </div>
+    </div>
+    <div class="modal-footer border-0">
+      <button class="btn btn-danger btn-sm" id="deleteEvent">Eliminar evento</button>
+      <button class="btn btn-primary btn-sm" id="saveEvent">Guardar</button>
+    </div>
+  </div></div>
+</div>
 
-  <script>
-    const calendarBody = document.getElementById('calendarBody');
-    const eventModal = new bootstrap.Modal(document.getElementById('eventModal'));
-    let events = JSON.parse(localStorage.getItem('weeklyEvents')) || {};
-    const hours = Array.from({length:14},(_,i)=>i+8);
-    const days = ['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
-
-    function saveEventsToStorage(){ localStorage.setItem('weeklyEvents', JSON.stringify(events)); }
-
-    function fillHourSelectors(){
-      const start = document.getElementById('startHour');
-      const end = document.getElementById('endHour');
-      for(let h=0;h<24;h++){
-        start.innerHTML += `<option value='${h}'>${h}:00</option>`;
-        end.innerHTML   += `<option value='${h}'>${h}:00</option>`;
-      }
-      end.value = 1;
-    }
-    fillHourSelectors();
-
-    function renderCalendar(){
-      calendarBody.innerHTML = '';
-      hours.forEach(hour=>{
-        const row=document.createElement('tr');
-        row.innerHTML = `<td>${hour}:00</td>`;
-        days.forEach((day,index)=>{
-          const cell=document.createElement('td');
-          cell.className='hour-cell';
-          cell.dataset.day=day;
-          cell.dataset.hour=hour;
-          // diferenciar horizontalmente con bordes y sombras
-          cell.style.borderRight = index < days.length - 1 ? '2px solid #b0c4de' : '';
-          cell.style.boxShadow = 'inset -1px 0 0 rgba(0,0,0,0.05)';
-
-          const key=`${day}-${hour}`;
-          if(events[key]){
-            const e = events[key];
-            const div=document.createElement('div');
-            div.className='event-box';
-            div.style.background=e.color;
-            div.textContent=e.text;
-            cell.appendChild(div);
-          }
-          cell.onclick=()=>openModal(day);
-          row.appendChild(cell);
-        });
-        calendarBody.appendChild(row);
-      });
-    }
-
-    function openModal(day){
-      document.getElementById('modal-day').value = day;
-      document.getElementById('modal-hour').value = 0;
-      eventText.value = '';
-      eventColor.value = '#0d6efd';
-      document.getElementById('deleteEvent').style.display='none';
-      eventModal.show();
-    }
-
-    saveEvent.onclick = ()=>{
-      const day = document.getElementById('modal-day').value;
-      const start = parseInt(startHour.value);
-      const end   = parseInt(endHour.value);
-      const text  = eventText.value.trim();
-      const color = eventColor.value;
-      if(end <= start){ alert('La hora de fin debe ser mayor.'); return; }
-      if(text === ''){ alert('Escribe una descripción.'); return; }
-      for(let h=start; h<end; h++){ events[`${day}-${h}`] = { text, color }; }
-      saveEventsToStorage(); renderCalendar(); eventModal.hide();
-    };
-
-    deleteEvent.onclick = ()=>{
-      const day=document.getElementById('modal-day').value;
-      const start=parseInt(startHour.value);
-      const end=parseInt(endHour.value);
-      for(let h=start; h<end; h++){ delete events[`${day}-${h}`]; }
-      saveEventsToStorage(); renderCalendar(); eventModal.hide();
-    };
-
-    const { jsPDF } = window.jspdf;
-    document.getElementById('downloadPdf').onclick = async ()=>{
-      const calendar=document.getElementById('calendarContainer');
-      const canvas=await html2canvas(calendar,{scale:2});
-      const img=canvas.toDataURL('image/png');
-      const pdf=new jsPDF('p','pt','a4');
-      const pw=pdf.internal.pageSize.getWidth();
-      const ph=pdf.internal.pageSize.getHeight();
-      const props=pdf.getImageProperties(img);
-      let h=(props.height*pw)/props.width;
-      if(h>ph) h=ph;
-      pdf.addImage(img,'PNG',0,0,pw,h);
-      pdf.save('calendario.pdf');
-    };
-
-    renderCalendar();
-  </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const calendarBody=document.getElementById('calendarBody');
+const eventModal=new bootstrap.Modal(document.getElementById('eventModal'));
+let events=JSON.parse(localStorage.getItem('weeklyEvents'))||{};
+const hours=Array.from({length:28},(_,i)=>(i*0.5)+8);
+const days=['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
+function saveEventsToStorage(){localStorage.setItem('weeklyEvents',JSON.stringify(events));}
+function fillEndSelector(){const end=document.getElementById('endHour');end.innerHTML='';hours.forEach(h=>{const hr=Math.floor(h);const min=(h-Math.floor(h))*60;const label=`${hr}:${min===0?'00':min}`;end.innerHTML+=`<option value='${h}'>${label}</option>`;});}
+fillEndSelector();
+function renderCalendar(){calendarBody.innerHTML='';hours.forEach(hour=>{const row=document.createElement('tr');const hr=Math.floor(hour);const min=(hour-Math.floor(hour))*60;row.innerHTML=`<td>${hr}:${min===0?'00':min}</td>`;days.forEach(day=>{const cell=document.createElement('td');cell.className='hour-cell';cell.dataset.day=day;cell.dataset.hour=hour;const event=Object.values(events).find(ev=>ev.day===day&&ev.startHour<=hour&&ev.endHour>hour);if(event&&!cell.querySelector('.event-box')){const div=document.createElement('div');div.className='event-box';div.style.background=event.color;div.textContent=event.text;div.onclick=ev=>{ev.stopPropagation();openModal(event.day,event.startHour);};cell.appendChild(div);}cell.onclick=()=>openModal(day,hour);row.appendChild(cell);});calendarBody.appendChild(row);});}
+function openModal(day,startHour){document.getElementById('modal-day').value=day;document.getElementById('modal-start').value=startHour;const event=Object.values(events).find(ev=>ev.day===day&&ev.startHour===startHour);if(event){eventText.value=event.text;eventColor.value=event.color;deleteEvent.style.display='inline-block';endHour.value=event.endHour;}else{eventText.value='';eventColor.value='#ff6a00';deleteEvent.style.display='none';endHour.value=startHour+0.5;}eventModal.show();}
+saveEvent.onclick=()=>{const day=document.getElementById('modal-day').value;const start=parseFloat(document.getElementById('modal-start').value);const end=parseFloat(endHour.value);const text=eventText.value.trim();const color=eventColor.value;if(text===''){alert('Escribe una descripción.');return;}if(end<=start){alert('La hora de fin debe ser mayor a la de inicio.');return;}events[`${day}-${start}`]={day,startHour:start,endHour:end,text,color};saveEventsToStorage();renderCalendar();eventModal.hide();};
+deleteEvent.onclick=()=>{const day=document.getElementById('modal-day').value;const start=parseFloat(document.getElementById('modal-start').value);delete events[`${day}-${start}`];saveEventsToStorage();renderCalendar();eventModal.hide();};
+const {jsPDF}=window.jspdf;document.getElementById('downloadPdf').onclick=async()=>{const calendar=document.getElementById('calendarContainer');const canvas=await html2canvas(calendar,{scale:2});const img=canvas.toDataURL('image/png');const pdf=new jsPDF('p','pt','a4');const pw=pdf.internal.pageSize.getWidth();const ph=pdf.internal.pageSize.getHeight();const props=pdf.getImageProperties(img);let h=(props.height*pw)/props.width;if(h>ph)h=ph;pdf.addImage(img,'PNG',0,0,pw,h);pdf.save('calendario_colorido.pdf');};
+renderCalendar();
+</script>
 
 </body>
 </html>
